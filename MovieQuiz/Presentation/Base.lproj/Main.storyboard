@@ -8,6 +8,14 @@
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="YS Display-Bold.ttf">
+            <string>YSDisplay-Bold</string>
+        </array>
+        <array key="YS Display-Medium.ttf">
+            <string>YSDisplay-Medium</string>
+        </array>
+    </customFonts>
     <scenes>
         <!--Movie Quiz View Controller-->
         <scene sceneID="tne-QT-ifu">
@@ -24,14 +32,14 @@
                                         <rect key="frame" x="0.0" y="0.0" width="353" height="23.666666666666668"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Вопрос" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zDN-7d-K1e" userLabel="numberQuestion">
-                                                <rect key="frame" x="0.0" y="0.0" width="323" height="23.666666666666668"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="317" height="23.666666666666668"/>
                                                 <fontDescription key="fontDescription" name="YSDisplay-Medium" family="YS Display" pointSize="20"/>
                                                 <color key="textColor" name="YP White (iOS)"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="1/10" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KfY-Z1-dn4" userLabel="counterLabel">
-                                                <rect key="frame" x="323" y="0.0" width="30" height="23.666666666666668"/>
-                                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
+                                                <rect key="frame" x="317" y="0.0" width="36" height="23.666666666666668"/>
+                                                <fontDescription key="fontDescription" name="YSDisplay-Medium" family="YS Display" pointSize="20"/>
                                                 <color key="textColor" name="YP White (iOS)"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
@@ -43,9 +51,15 @@
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="U5m-qv-dqq" secondAttribute="height" multiplier="2:3" id="9xg-dY-toi"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="20"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Рейтинг этого фильма меньше, чем 5?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rqG-1d-cby" userLabel="Question Label">
-                                        <rect key="frame" x="0.0" y="593.33333333333337" width="340.66666666666669" height="75.666666666666629"/>
+                                        <rect key="frame" x="0.0" y="593.33333333333337" width="353" height="75.666666666666629"/>
                                         <fontDescription key="fontDescription" name="YSDisplay-Bold" family="YS Display" pointSize="23"/>
                                         <color key="textColor" name="YP White (iOS)"/>
                                         <nil key="highlightedColor"/>
@@ -61,7 +75,7 @@
                                                 </constraints>
                                                 <fontDescription key="fontDescription" name="YSDisplay-Medium" family="YS Display" pointSize="20"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                <state key="normal" title="НЕТ">
+                                                <state key="normal" title="Нет">
                                                     <color key="titleColor" name="YP Black (iOS)"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
@@ -78,7 +92,7 @@
                                                 <color key="backgroundColor" name="YP White (iOS)"/>
                                                 <fontDescription key="fontDescription" name="YSDisplay-Medium" family="YS Display" pointSize="20"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                <state key="normal" title="ДА">
+                                                <state key="normal" title="Да">
                                                     <color key="titleColor" name="YP Black (iOS)"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
@@ -97,6 +111,10 @@
                                         </constraints>
                                     </stackView>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstItem="g8z-Xc-aZs" firstAttribute="top" secondItem="rqG-1d-cby" secondAttribute="bottom" constant="20" id="yjJ-O0-WN3"/>
+                                    <constraint firstItem="rqG-1d-cby" firstAttribute="top" secondItem="U5m-qv-dqq" secondAttribute="bottom" constant="20.000000000000114" id="zhp-a9-tO1"/>
+                                </constraints>
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -105,9 +123,11 @@
                             <constraint firstItem="bW3-4D-vzK" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="2Ye-hr-8uf"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="gHy-SP-YTz" secondAttribute="trailing" constant="20" id="Hvi-qB-Bwr"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="g8z-Xc-aZs" secondAttribute="trailing" constant="20" id="Ksd-XG-D8o"/>
+                            <constraint firstItem="rqG-1d-cby" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="XVf-Ij-LLG"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="bW3-4D-vzK" secondAttribute="trailing" constant="20" id="qTo-7e-0qy"/>
                             <constraint firstItem="bW3-4D-vzK" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="snP-Ie-4kh"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="bW3-4D-vzK" secondAttribute="bottom" id="tvd-xY-5vH"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="rqG-1d-cby" secondAttribute="trailing" constant="20" id="utr-Qo-YB7"/>
                         </constraints>
                     </view>
                     <connections>

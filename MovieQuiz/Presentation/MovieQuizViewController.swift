@@ -1,6 +1,9 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController {
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
 //Outlets
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
@@ -34,19 +37,16 @@ final class MovieQuizViewController: UIViewController {
     }
 //Actions
     @IBAction private func noButton(_ sender: UIButton) {
+        noButton.isEnabled = false
+        yesButton.isEnabled = false
         let isCorrect = checkAnswer(false)
             showAnswerResults(isCorrect: isCorrect)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.showNextQuestionOrResults()
-            }
         }
     @IBAction private func yesButton(_ sender: UIButton) {
-        sender.layer.cornerRadius = 15
+        yesButton.isEnabled = false
+        noButton.isEnabled = false
         let isCorrect = checkAnswer(true)
            showAnswerResults(isCorrect: isCorrect)
-           DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-               self.showNextQuestionOrResults()
-           }
        }
 //Funcs
     private func configureButtons() {
@@ -58,7 +58,6 @@ final class MovieQuizViewController: UIViewController {
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
     }
-    
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -77,12 +76,12 @@ final class MovieQuizViewController: UIViewController {
     }
     private func showAnswerResults(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 10
-        imageView.layer.borderColor = UIColor.white.cgColor
-        imageView.layer.cornerRadius = 10
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.red.cgColor
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.imageView.layer.borderColor = UIColor.ypWhite.cgColor
+        imageView.layer.borderWidth = 8
+        imageView.layer.cornerRadius = 20
+        imageView.layer.borderColor = isCorrect ? UIColor.ypGreenIOS.cgColor : UIColor.ypRedIOS.cgColor
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.imageView.layer.borderColor = UIColor.clear.cgColor
+            self.showNextQuestionOrResults()
             }
         }
     private func checkRecordCorrectAnswers() {
@@ -93,6 +92,8 @@ final class MovieQuizViewController: UIViewController {
     }
     // Функция показа следующего вопроса или результатов
     private func showNextQuestionOrResults() {
+        noButton.isEnabled = true
+        yesButton.isEnabled = true
         currentQuestionIndex += 1
         if let recordTime = currentTime {
             let dateFormatter = DateFormatter()
