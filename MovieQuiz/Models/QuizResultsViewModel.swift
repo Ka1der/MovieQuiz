@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+struct QuizResultsViewModel {
+    let correctAnswers: Int
+    let totalQuestions: Int
+}
