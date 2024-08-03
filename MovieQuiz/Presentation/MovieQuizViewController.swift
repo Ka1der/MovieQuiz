@@ -40,6 +40,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         configureButtons()
     }
     
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
+    }
+    
     private func showLoadincIndcicator() {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
