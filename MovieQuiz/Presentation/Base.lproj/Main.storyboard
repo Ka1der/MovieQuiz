@@ -116,7 +116,7 @@
                                     <constraint firstItem="rqG-1d-cby" firstAttribute="top" secondItem="U5m-qv-dqq" secondAttribute="bottom" constant="20.000000000000114" id="zhp-a9-tO1"/>
                                 </constraints>
                             </stackView>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="kQe-Cy-kSX">
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="kQe-Cy-kSX" userLabel="Activity Indicator">
                                 <rect key="frame" x="186.66666666666666" y="416" width="20" height="20"/>
                             </activityIndicatorView>
                         </subviews>
@@ -136,7 +136,7 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="activityAndicator" destination="kQe-Cy-kSX" id="LIw-B3-IOb"/>
+                        <outlet property="activityIndicator" destination="kQe-Cy-kSX" id="ZGc-EZ-KaE"/>
                         <outlet property="counterLabel" destination="KfY-Z1-dn4" id="SKG-dp-vGh"/>
                         <outlet property="imageView" destination="U5m-qv-dqq" id="WzF-kw-RLd"/>
                         <outlet property="noButton" destination="XRi-PJ-kZ6" id="UXa-oG-v6F"/>

@@ -31,20 +31,28 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         yesButton.layer.cornerRadius = 15
         noButton.layer.cornerRadius = 15
         
-        let questionFactory = QuestionFactory()
-        questionFactory.setup(delegate: self)
+        let questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         self.questionFactory = questionFactory
         self.alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
         
+        //        let questionFactory = QuestionFactory()
+        //        questionFactory.setup(delegate: self)
+        //        self.questionFactory = questionFactory
+        //        self.alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
+        
         requestNextQuestionAndUpdateUI()
         configureButtons()
+        
+        statisticService = StatisticService()
+        showLoadincIndcicator()
+        questionFactory.loadData()
     }
     
     func didLoadDataFromServer() {
         activityIndicator.isHidden = true
         questionFactory?.requestNextQuestion()
     }
-
+    
     func didFailToLoadData(with error: Error) {
         showNetworkError(message: error.localizedDescription)
     }
@@ -177,15 +185,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1) / \(questionsAmount)")
     }
-    
-//    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-//        let questionStep = QuizStepViewModel(
-//            image: UIImage(named: model.image) ?? UIImage(),
-//            question: model.text,
-//            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
-//        )
-//        return questionStep
-//    }
     
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
