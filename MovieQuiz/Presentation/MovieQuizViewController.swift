@@ -35,22 +35,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         self.questionFactory = questionFactory
         self.alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
         
-        //        let questionFactory = QuestionFactory()
-        //        questionFactory.setup(delegate: self)
-        //        self.questionFactory = questionFactory
-        //        self.alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
-        
-        requestNextQuestionAndUpdateUI()
         configureButtons()
-        
+       
         statisticService = StatisticService()
         showLoadincIndcicator()
         questionFactory.loadData()
     }
     
     func didLoadDataFromServer() {
-        activityIndicator.isHidden = true
-        questionFactory?.requestNextQuestion()
+        hideLoadingIndicator()
+        requestNextQuestionAndUpdateUI()
     }
     
     func didFailToLoadData(with error: Error) {
@@ -76,11 +70,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
-            self.questionFactory?.requestNextQuestion()
-        }
-        
-        alertPresenter?.showAlert(model: model)
-    }
+            if let question = self.questionFactory?.requestNextQuestion() {
+                       self.didReceiveNextQuestion(question: question)
+                   } else {
+                       self.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
+                   }
+               }
+               
+               alertPresenter?.showAlert(model: model)
+           }
     
     private func configureButtons() {
         yesButton.layer.cornerRadius = 15
@@ -101,12 +99,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     private func requestNextQuestionAndUpdateUI() {
-        guard let firstQuestion = questionFactory?.requestNextQuestion() else {
+        guard let question = questionFactory?.requestNextQuestion() else {
             showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
             return
         }
-        currentQuestion = firstQuestion
-        let viewModel = convert(model: firstQuestion)
+        currentQuestion = question
+        let viewModel = convert(model: question)
         show(quiz: viewModel)
     }
     
@@ -159,10 +157,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
             return
         }
-        
+
         currentQuestion = question
         let viewModel = convert(model: question)
-        
+
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }

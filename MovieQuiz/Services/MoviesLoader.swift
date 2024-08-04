@@ -44,5 +44,3 @@ struct MoviesLoaderMock: MoviesLoading {
         
     }
 }
-
-
