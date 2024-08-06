@@ -35,9 +35,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         self.questionFactory = questionFactory
         self.alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
         
+        requestNextQuestionAndUpdateUI()
         configureButtons()
         
-        statisticService = StatisticService()
         showLoadincIndcicator()
         questionFactory.loadData()
     }
