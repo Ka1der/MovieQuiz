@@ -13,6 +13,7 @@ struct NetworkClient {
     
     private enum NetworkError: Error {
         case codeError
+        case noDataError
     }
     
     func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
@@ -30,13 +31,17 @@ struct NetworkClient {
                 return
             }
             
-            guard let data = data else { return }
+            guard let data = data else {
+                handler(.failure(NetworkError.noDataError))
+                return
+            }
             handler(.success(data))
         }
         
         task.resume()
     }
-    public enum Result<Success, Failure> where Failure : Error {
+    
+    public enum Result<Success, Failure> where Failure: Error {
         case success(Success)
         case failure(Failure)
     }

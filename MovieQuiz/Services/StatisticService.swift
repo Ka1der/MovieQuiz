@@ -63,14 +63,8 @@ final class StatisticService: StatisticServiceProtocol {
         gamesCount += 1
         
         let currentGameResult = GameResult(correct: count, total: amount, date: Date())
-        if isBestGame(currentGameResult) {
+        if currentGameResult.isBetterThan(bestGame) {
             bestGame = currentGameResult
         }
-    }
-    
-    
-    private func isBestGame(_ result: GameResult) -> Bool {
-        let bestGame = self.bestGame
-        return result.correct > bestGame.correct || (result.correct == bestGame.correct && result.total < bestGame.total)
     }
 }

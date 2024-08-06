@@ -37,7 +37,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         requestNextQuestionAndUpdateUI()
         configureButtons()
         
-        showLoadingIndcicator()
+        showLoadincIndcicator()
         questionFactory?.loadData()
     }
     
@@ -50,7 +50,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         showNetworkError(message: error.localizedDescription)
     }
     
-    private func showLoadingIndcicator() {
+    private func showLoadincIndcicator() {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
     }
