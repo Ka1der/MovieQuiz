@@ -32,10 +32,10 @@ struct MoviesLoader: MoviesLoading {
                 }
             case .failure(let error):
                 handler(.failure(error))
-                }
             }
         }
     }
+}
 
 struct MoviesLoaderMock: MoviesLoading {
     private let networkClient = NetworkClient()

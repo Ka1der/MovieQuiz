@@ -36,7 +36,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         self.alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
         
         configureButtons()
-       
+        
         statisticService = StatisticService()
         showLoadincIndcicator()
         questionFactory.loadData()
@@ -71,14 +71,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             if let question = self.questionFactory?.requestNextQuestion() {
-                       self.didReceiveNextQuestion(question: question)
-                   } else {
-                       self.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
-                   }
-               }
-               
-               alertPresenter?.showAlert(model: model)
-           }
+                self.didReceiveNextQuestion(question: question)
+            } else {
+                self.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
+            }
+        }
+        
+        alertPresenter?.showAlert(model: model)
+    }
     
     private func configureButtons() {
         yesButton.layer.cornerRadius = 15
@@ -157,10 +157,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
             return
         }
-
+        
         currentQuestion = question
         let viewModel = convert(model: question)
-
+        
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
