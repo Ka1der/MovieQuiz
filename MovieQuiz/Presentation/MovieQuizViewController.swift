@@ -31,15 +31,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         yesButton.layer.cornerRadius = 15
         noButton.layer.cornerRadius = 15
         
-        let questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
-        self.questionFactory = questionFactory
-        self.alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
         
         requestNextQuestionAndUpdateUI()
         configureButtons()
         
         showLoadincIndcicator()
-        questionFactory.loadData()
+        questionFactory?.loadData()
     }
     
     func didLoadDataFromServer() {
