@@ -4,16 +4,15 @@
 //
 //  Created by Kaider on 11.08.2024.
 //
-
-
 import XCTest
+
 @testable import MovieQuiz
 
 class MoviesLoaderTests: XCTestCase {
     
     func testSuccessLoading() throws {
         // Given
-        let stubNetworkClient = StubNetworkClient(emulateError: false) // говорим, что не хотим эмулировать ошибку
+        let stubNetworkClient = StubNetworkClient(emulateError: false)
         let loader = MoviesLoader(networkClient: stubNetworkClient)
         
         // When

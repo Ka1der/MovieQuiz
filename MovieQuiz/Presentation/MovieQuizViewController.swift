@@ -111,9 +111,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private func showNextQuestionOrResults() {
         noButton.isEnabled = true
         yesButton.isEnabled = true
-        presenter.currentQuestionIndex += 1
+        presenter.switchToNextQuestion()
         
-        if presenter.currentQuestionIndex < presenter.questionsAmount {
+        if presenter.accessToCurrentQuestionIndex < presenter.questionsAmount {
                     guard let nextQuestion = questionFactory?.requestNextQuestion() else {
                         return
                     }
@@ -133,7 +133,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     func restartQuiz() {
-        presenter.currentQuestionIndex = 0
+        presenter.resetQuestionIndex()
         correctAnswers = 0
         requestNextQuestionAndUpdateUI()
     }
