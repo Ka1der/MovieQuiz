@@ -15,14 +15,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     // Variables
+    private let presenter = MovieQuizPresenter()
     private var statisticService: StatisticServiceProtocol = StatisticService()
-    private let questionsAmount: Int = 10
+   // private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter: AlertPresenter?
     private var currentQuestion: QuizQuestion?
     private var currentTime: Date?
     private var recordCorrectAnswers = 0
-    private var currentQuestionIndex = 0
+    //private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
     // Lifecycle
@@ -67,7 +68,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
                                buttonText: "Попробовать еще раз") { [weak self] in
             guard let self = self else { return }
             
-            self.currentQuestionIndex = 0
+            //self.currentQuestionIndex = 0
             self.correctAnswers = 0
             if let question = self.questionFactory?.requestNextQuestion() {
                 self.didReceiveNextQuestion(question: question)
@@ -103,27 +104,36 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             return
         }
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         show(quiz: viewModel)
     }
     
     private func showNextQuestionOrResults() {
         noButton.isEnabled = true
         yesButton.isEnabled = true
-        currentQuestionIndex += 1
+        presenter.currentQuestionIndex += 1
         
-        if currentQuestionIndex < questionsAmount {
-            guard let nextQuestion = questionFactory?.requestNextQuestion() else {
-                return
-            }
-            show(quiz: convert(model: nextQuestion))
-        } else {
-            alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: questionsAmount)
-        }
+        if presenter.currentQuestionIndex < presenter.questionsAmount {
+                    guard let nextQuestion = questionFactory?.requestNextQuestion() else {
+                        return
+                    }
+                    show(quiz: presenter.convert(model: nextQuestion))
+                } else {
+                    alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
+                }
+        
+//        if presenter.currentQuestionIndex < presenter.questionsAmount {
+//            guard let nextQuestion = questionFactory?.requestNextQuestion() else {
+//                return
+//            }
+//            show(quiz: presenter.convert(model: nextQuestion))
+//        } else {
+//            alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
+//        }
     }
     
     func restartQuiz() {
-        currentQuestionIndex = 0
+        presenter.currentQuestionIndex = 0
         correctAnswers = 0
         requestNextQuestionAndUpdateUI()
     }
@@ -158,7 +168,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
         
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
@@ -176,12 +186,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
     }
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        return QuizStepViewModel (
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1) / \(questionsAmount)")
-    }
+//    private func convert(model: QuizQuestion) -> QuizStepViewModel {
+//            return QuizStepViewModel (
+//                image: UIImage(data: model.image) ?? UIImage(),
+//                question: model.text,
+//                questionNumber: "\(currentQuestionIndex + 1) / \(questionsAmount)")
+//        }
+
     
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
