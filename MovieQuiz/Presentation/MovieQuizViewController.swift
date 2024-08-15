@@ -44,16 +44,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         noButton.layer.cornerRadius = 15
     }
     
-    func disableButtons() {
-        noButton.isEnabled = false
-        yesButton.isEnabled = false
+    private func onOffButtons (_ isEnabled: Bool) {
+        noButton.isEnabled = isEnabled
+        yesButton.isEnabled = isEnabled
     }
     
-    func enableButtons() {
-        noButton.isEnabled = true
-        yesButton.isEnabled = true
-    }
-    
+
     func didLoadDataFromServer() {
         showLoadingIndicator(isLoading: false)
         requestNextQuestionAndUpdateUI()
@@ -71,7 +67,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             activityIndicator.stopAnimating()
         }
     }
-    
+    // вынести в presenter кроме алерта
     private func showNetworkError(message: String) {
         showLoadingIndicator(isLoading: false)
         
@@ -101,7 +97,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             self.showNextQuestionOrResults()
         }
     }
-    
+    // вынести в presenter кроме алерта
     func checkAnswer(_ answer: Bool) -> Bool {
         guard let currentQuestion = currentQuestion else {
             showAlert(title: "Ошибка", message: "Вопрос не найден")
@@ -114,7 +110,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
         return isCorrect
     }
-    
+    // вынести в presenter кроме алерта
     private func requestNextQuestionAndUpdateUI() {
         guard let question = questionFactory?.requestNextQuestion() else {
             showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
@@ -124,9 +120,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         let viewModel = presenter.convert(model: question)
         show(quiz: viewModel)
     }
-    
+        // вынести в presenter
     private func showNextQuestionOrResults() {
-        enableButtons()
+        onOffButtons(true)
         presenter.switchToNextQuestion()
         
         if presenter.accessToCurrentQuestionIndex < presenter.questionsAmount {
@@ -138,7 +134,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
         }
     }
-    
+    // вынести в presenter
     func restartQuiz() {
         presenter.resetQuestionIndex()
         correctAnswers = 0
@@ -149,14 +145,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         let alertModel = AlertModel(title: title, message: message, buttonText: "ОК", completion: completion)
         alertPresenter?.showAlert(model: alertModel)
     }
-    
+    // вынести в presenter
     private func checkRecordCorrectAnswers() {
         if correctAnswers > recordCorrectAnswers {
             recordCorrectAnswers = correctAnswers
             currentTime = Date()
         }
     }
-    
+    // вынести в presenter кроме алерта
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
             showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
@@ -174,14 +170,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     func presentAlert(alert: UIAlertController) {
         present(alert, animated: true, completion: nil)
     }
-    
+    // вынести в presenter
     func didCheckAnswer(isCorrect: Bool) {
         if isCorrect {
             correctAnswers += 1
             checkRecordCorrectAnswers()
         }
     }
-    
+    // вынести в presenter
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
@@ -189,12 +185,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     @IBAction private func noButton(_ sender: UIButton) {
-        disableButtons()
+        onOffButtons(false)
         presenter.noButton(sender)
     }
    
     @IBAction private func yesButton(_ sender: UIButton) {
-        disableButtons()
+        onOffButtons(false)
         presenter.yesButton(sender)
     }
 }
