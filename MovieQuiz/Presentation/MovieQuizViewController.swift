@@ -35,9 +35,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         
         requestNextQuestionAndUpdateUI()
         configureButtons()
-        
-        showLoadingIndicator()
+        showLoadingIndicator(isLoading: true)
         questionFactory?.loadData()
+    }
+    
+    private func configureButtons() {
+        yesButton.layer.cornerRadius = 15
+        noButton.layer.cornerRadius = 15
     }
     
     func disableButtons() {
@@ -51,7 +55,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     func didLoadDataFromServer() {
-        hideLoadingIndicator()
+        showLoadingIndicator(isLoading: false)
         requestNextQuestionAndUpdateUI()
     }
     
@@ -59,17 +63,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         showNetworkError(message: error.localizedDescription)
     }
     
-    private func showLoadingIndicator() {
-        activityIndicator.isHidden = false
-        activityIndicator.startAnimating()
-    }
-    
-    private func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
+    private func showLoadingIndicator(isLoading: Bool) {
+        activityIndicator.isHidden = !isLoading
+        if isLoading {
+            activityIndicator.startAnimating()
+        } else {
+            activityIndicator.stopAnimating()
+        }
     }
     
     private func showNetworkError(message: String) {
-        hideLoadingIndicator()
+        showLoadingIndicator(isLoading: false)
         
         let model = AlertModel(title: "Ошибка",
                                message: message,
@@ -85,11 +89,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
         
         alertPresenter?.showAlert(model: model)
-    }
-    
-    private func configureButtons() {
-        yesButton.layer.cornerRadius = 15
-        noButton.layer.cornerRadius = 15
     }
     
     private func showAnswerResults(isCorrect: Bool) {
