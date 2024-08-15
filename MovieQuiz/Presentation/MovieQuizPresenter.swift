@@ -7,12 +7,20 @@
 
 import UIKit
 
-final class MovieQuizPresenter {
+final class MovieQuizPresenter: UIViewController {
+    
+    //var currentQuestion: QuizQuestion?
+    weak var viewController: MovieQuizViewController?
+    
+    let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
+    
+    var movieQuizViewController: MovieQuizViewController?
     var accessToCurrentQuestionIndex: Int {
         return currentQuestionIndex
     }
-    let questionsAmount: Int = 10
+    var checkAnswer: ((Bool) -> Bool)?
+    var showAnswerResults: ((Bool) -> Void)?
     
     func convert(model: QuizQuestion) -> QuizStepViewModel {
             return QuizStepViewModel (
@@ -31,5 +39,15 @@ final class MovieQuizPresenter {
     
     func switchToNextQuestion() {
         currentQuestionIndex += 1
+    }
+    
+   func noButton(_ sender: UIButton) {
+        let isCorrect = checkAnswer?(true) ?? false
+        showAnswerResults?(isCorrect)
+    }
+    
+    func yesButton(_ sender: UIButton) {
+        let isCorrect = checkAnswer?(true) ?? false
+        showAnswerResults?(isCorrect)
     }
 }

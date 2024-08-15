@@ -15,9 +15,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     // Variables
-    private let presenter = MovieQuizPresenter()
+    private var presenter = MovieQuizPresenter()
     private var statisticService: StatisticServiceProtocol = StatisticService()
-   // private let questionsAmount: Int = 10
+    // private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter: AlertPresenter?
     private var currentQuestion: QuizQuestion?
@@ -26,11 +26,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     //private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
+    //    var accessToCheckAnswer: Bool {
+    //        return checkAnswer(false)
+    //    }
+    
     // Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        yesButton.layer.cornerRadius = 15
-        noButton.layer.cornerRadius = 15
+        presenter = MovieQuizPresenter()
+        presenter.checkAnswer = {[weak self] answer in return self?.checkAnswer(answer) ?? false}
+        presenter.showAnswerResults = {[weak self] isCorrect in self?.showAnswerResults(isCorrect: isCorrect) }
+        // configureButtons()
         
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
@@ -40,6 +46,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         
         showLoadingIndicator()
         questionFactory?.loadData()
+    }
+    
+    func disableButtons() {
+        noButton.isEnabled = false
+        yesButton.isEnabled = false
+    }
+    
+    func enableButtons() {
+        noButton.isEnabled = true
+        yesButton.isEnabled = true
     }
     
     func didLoadDataFromServer() {
@@ -85,7 +101,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         noButton.layer.cornerRadius = 15
     }
     
-    private func checkAnswer(_ answer: Bool) -> Bool {
+    private func showAnswerResults(isCorrect: Bool) {
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 8
+        imageView.layer.cornerRadius = 20
+        imageView.layer.borderColor = isCorrect ? UIColor.ypGreenIOS.cgColor : UIColor.ypRedIOS.cgColor
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.imageView.layer.borderColor = UIColor.clear.cgColor
+            self.showNextQuestionOrResults()
+        }
+    }
+    
+    func checkAnswer(_ answer: Bool) -> Bool {
         guard let currentQuestion = currentQuestion else {
             showAlert(title: "Ошибка", message: "Вопрос не найден")
             return false
@@ -98,6 +125,19 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         return isCorrect
     }
     
+    //   func checkAnswer(_ answer: Bool) -> Bool {
+    //        guard let currentQuestion = currentQuestion else {
+    //            showAlert(title: "Ошибка", message: "Вопрос не найден")
+    //            return false
+    //        }
+    //        let isCorrect = currentQuestion.correctAnswer == answer
+    //        if isCorrect {
+    //            correctAnswers += 1
+    //            checkRecordCorrectAnswers()
+    //        }
+    //        return isCorrect
+    //    }
+    
     private func requestNextQuestionAndUpdateUI() {
         guard let question = questionFactory?.requestNextQuestion() else {
             showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
@@ -109,44 +149,32 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     private func showNextQuestionOrResults() {
-        noButton.isEnabled = true
-        yesButton.isEnabled = true
+        enableButtons()
         presenter.switchToNextQuestion()
         
         if presenter.accessToCurrentQuestionIndex < presenter.questionsAmount {
-                    guard let nextQuestion = questionFactory?.requestNextQuestion() else {
-                        return
-                    }
-                    show(quiz: presenter.convert(model: nextQuestion))
-                } else {
-                    alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
-                }
+            guard let nextQuestion = questionFactory?.requestNextQuestion() else {
+                return
+            }
+            show(quiz: presenter.convert(model: nextQuestion))
+        } else {
+            alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
+        }
         
-//        if presenter.currentQuestionIndex < presenter.questionsAmount {
-//            guard let nextQuestion = questionFactory?.requestNextQuestion() else {
-//                return
-//            }
-//            show(quiz: presenter.convert(model: nextQuestion))
-//        } else {
-//            alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
-//        }
+        //        if presenter.currentQuestionIndex < presenter.questionsAmount {
+        //            guard let nextQuestion = questionFactory?.requestNextQuestion() else {
+        //                return
+        //            }
+        //            show(quiz: presenter.convert(model: nextQuestion))
+        //        } else {
+        //            alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
+        //        }
     }
     
     func restartQuiz() {
         presenter.resetQuestionIndex()
         correctAnswers = 0
         requestNextQuestionAndUpdateUI()
-    }
-    
-    private func showAnswerResults(isCorrect: Bool) {
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 8
-        imageView.layer.cornerRadius = 20
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreenIOS.cgColor : UIColor.ypRedIOS.cgColor
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.imageView.layer.borderColor = UIColor.clear.cgColor
-            self.showNextQuestionOrResults()
-        }
     }
     
     private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
@@ -186,13 +214,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
     }
     
-//    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-//            return QuizStepViewModel (
-//                image: UIImage(data: model.image) ?? UIImage(),
-//                question: model.text,
-//                questionNumber: "\(currentQuestionIndex + 1) / \(questionsAmount)")
-//        }
-
+    //    private func convert(model: QuizQuestion) -> QuizStepViewModel {
+    //            return QuizStepViewModel (
+    //                image: UIImage(data: model.image) ?? UIImage(),
+    //                question: model.text,
+    //                questionNumber: "\(currentQuestionIndex + 1) / \(questionsAmount)")
+    //        }
+    
     
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
@@ -201,17 +229,23 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     @IBAction private func noButton(_ sender: UIButton) {
-        noButton.isEnabled = false
-        yesButton.isEnabled = false
-        let isCorrect = checkAnswer(false)
-        showAnswerResults(isCorrect: isCorrect)
+        disableButtons()
+        presenter.noButton(sender)
     }
-    
+    //        noButton.isEnabled = false
+    //        yesButton.isEnabled = false
+    //        let isCorrect = checkAnswer(false)
+    //        showAnswerResults(isCorrect: isCorrect)
+    //    }
+    //
     @IBAction private func yesButton(_ sender: UIButton) {
-        yesButton.isEnabled = false
-        noButton.isEnabled = false
-        let isCorrect = checkAnswer(true)
-        showAnswerResults(isCorrect: isCorrect)
+        disableButtons()
+        presenter.noButton(sender)
     }
+    //        yesButton.isEnabled = false
+    //        noButton.isEnabled = false
+    //        let isCorrect = checkAnswer(true)
+    //        showAnswerResults(isCorrect: isCorrect)
+    //    }
     
 }
