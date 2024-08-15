@@ -7,19 +7,16 @@
 
 import UIKit
 
-final class MovieQuizPresenter: UIViewController {
+final class MovieQuizPresenter {
     
     weak var viewController: MovieQuizViewController?
-    
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
-    
-    var movieQuizViewController: MovieQuizViewController?
+    var checkAnswer: ((Bool) -> Bool)?
+    var showAnswerResults: ((Bool) -> Void)?
     var accessToCurrentQuestionIndex: Int {
         return currentQuestionIndex
     }
-    var checkAnswer: ((Bool) -> Bool)?
-    var showAnswerResults: ((Bool) -> Void)?
     
     func convert(model: QuizQuestion) -> QuizStepViewModel {
             return QuizStepViewModel (
@@ -41,10 +38,14 @@ final class MovieQuizPresenter: UIViewController {
     }
     
     private func handleAnswer(_ answer: Bool) {
-        let isCorrect = checkAnswer?(answer) ?? false
-        showAnswerResults?(isCorrect)
-        
-    }
+           guard let currentQuestion = viewController?.currentQuestion else {
+               viewController?.showAlert(title: "Ошибка", message: "Вопрос не найден")
+               return
+           }
+           
+           let isCorrect = checkAnswer(answer, currentQuestion: currentQuestion)
+           showAnswerResults?(isCorrect)
+       }
     
    func noButton(_ sender: UIButton) {
        handleAnswer(false)
@@ -53,4 +54,17 @@ final class MovieQuizPresenter: UIViewController {
     func yesButton(_ sender: UIButton) {
         handleAnswer(true)
     }
+    
+    private func checkAnswer(_ answer: Bool, currentQuestion: QuizQuestion?) -> Bool {
+            guard let question = currentQuestion else {
+                viewController?.showAlert(title: "Ошибка", message: "Вопрос не найден")
+                return false
+            }
+            let isCorrect = question.correctAnswer == answer
+            if isCorrect {
+                viewController?.correctAnswers += 1
+                viewController?.checkRecordCorrectAnswers()
+            }
+            return isCorrect
+        }
 }

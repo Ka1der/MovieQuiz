@@ -19,16 +19,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private var statisticService: StatisticServiceProtocol = StatisticService()
     private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter: AlertPresenter?
-    private var currentQuestion: QuizQuestion?
+    var currentQuestion: QuizQuestion?
     private var currentTime: Date?
     private var recordCorrectAnswers = 0
-    private var correctAnswers = 0
+    var correctAnswers = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        presenter = MovieQuizPresenter()
-        presenter.checkAnswer = {[weak self] answer in return self?.checkAnswer(answer) ?? false}
+        presenter.viewController = self
         presenter.showAnswerResults = {[weak self] isCorrect in self?.showAnswerResults(isCorrect: isCorrect) }
+        //presenter = MovieQuizPresenter()
         
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
@@ -49,7 +49,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         yesButton.isEnabled = isEnabled
     }
     
-
     func didLoadDataFromServer() {
         showLoadingIndicator(isLoading: false)
         requestNextQuestionAndUpdateUI()
@@ -67,7 +66,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             activityIndicator.stopAnimating()
         }
     }
-    // вынести в presenter кроме алерта
+   
     private func showNetworkError(message: String) {
         showLoadingIndicator(isLoading: false)
         
@@ -97,20 +96,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             self.showNextQuestionOrResults()
         }
     }
+    
     // вынести в presenter кроме алерта
-    func checkAnswer(_ answer: Bool) -> Bool {
-        guard let currentQuestion = currentQuestion else {
-            showAlert(title: "Ошибка", message: "Вопрос не найден")
-            return false
-        }
-        let isCorrect = currentQuestion.correctAnswer == answer
-        if isCorrect {
-            correctAnswers += 1
-            checkRecordCorrectAnswers()
-        }
-        return isCorrect
-    }
-    // вынести в presenter кроме алерта
+    
     private func requestNextQuestionAndUpdateUI() {
         guard let question = questionFactory?.requestNextQuestion() else {
             showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
@@ -141,12 +129,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         requestNextQuestionAndUpdateUI()
     }
     
-    private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+    func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         let alertModel = AlertModel(title: title, message: message, buttonText: "ОК", completion: completion)
         alertPresenter?.showAlert(model: alertModel)
     }
     // вынести в presenter
-    private func checkRecordCorrectAnswers() {
+    func checkRecordCorrectAnswers() {
         if correctAnswers > recordCorrectAnswers {
             recordCorrectAnswers = correctAnswers
             currentTime = Date()
