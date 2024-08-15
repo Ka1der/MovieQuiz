@@ -17,26 +17,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     // Variables
     private var presenter = MovieQuizPresenter()
     private var statisticService: StatisticServiceProtocol = StatisticService()
-    // private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter: AlertPresenter?
     private var currentQuestion: QuizQuestion?
     private var currentTime: Date?
     private var recordCorrectAnswers = 0
-    //private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
-    //    var accessToCheckAnswer: Bool {
-    //        return checkAnswer(false)
-    //    }
-    
-    // Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter = MovieQuizPresenter()
         presenter.checkAnswer = {[weak self] answer in return self?.checkAnswer(answer) ?? false}
         presenter.showAnswerResults = {[weak self] isCorrect in self?.showAnswerResults(isCorrect: isCorrect) }
-        // configureButtons()
         
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
@@ -84,7 +76,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
                                buttonText: "Попробовать еще раз") { [weak self] in
             guard let self = self else { return }
             
-            //self.currentQuestionIndex = 0
             self.correctAnswers = 0
             if let question = self.questionFactory?.requestNextQuestion() {
                 self.didReceiveNextQuestion(question: question)
@@ -125,19 +116,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         return isCorrect
     }
     
-    //   func checkAnswer(_ answer: Bool) -> Bool {
-    //        guard let currentQuestion = currentQuestion else {
-    //            showAlert(title: "Ошибка", message: "Вопрос не найден")
-    //            return false
-    //        }
-    //        let isCorrect = currentQuestion.correctAnswer == answer
-    //        if isCorrect {
-    //            correctAnswers += 1
-    //            checkRecordCorrectAnswers()
-    //        }
-    //        return isCorrect
-    //    }
-    
     private func requestNextQuestionAndUpdateUI() {
         guard let question = questionFactory?.requestNextQuestion() else {
             showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
@@ -160,15 +138,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         } else {
             alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
         }
-        
-        //        if presenter.currentQuestionIndex < presenter.questionsAmount {
-        //            guard let nextQuestion = questionFactory?.requestNextQuestion() else {
-        //                return
-        //            }
-        //            show(quiz: presenter.convert(model: nextQuestion))
-        //        } else {
-        //            alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
-        //        }
     }
     
     func restartQuiz() {
@@ -214,14 +183,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
     }
     
-    //    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-    //            return QuizStepViewModel (
-    //                image: UIImage(data: model.image) ?? UIImage(),
-    //                question: model.text,
-    //                questionNumber: "\(currentQuestionIndex + 1) / \(questionsAmount)")
-    //        }
-    
-    
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
@@ -232,20 +193,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         disableButtons()
         presenter.noButton(sender)
     }
-    //        noButton.isEnabled = false
-    //        yesButton.isEnabled = false
-    //        let isCorrect = checkAnswer(false)
-    //        showAnswerResults(isCorrect: isCorrect)
-    //    }
-    //
+   
     @IBAction private func yesButton(_ sender: UIButton) {
         disableButtons()
-        presenter.noButton(sender)
+        presenter.yesButton(sender)
     }
-    //        yesButton.isEnabled = false
-    //        noButton.isEnabled = false
-    //        let isCorrect = checkAnswer(true)
-    //        showAnswerResults(isCorrect: isCorrect)
-    //    }
-    
 }

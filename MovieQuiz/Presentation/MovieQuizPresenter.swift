@@ -9,7 +9,6 @@ import UIKit
 
 final class MovieQuizPresenter: UIViewController {
     
-    //var currentQuestion: QuizQuestion?
     weak var viewController: MovieQuizViewController?
     
     let questionsAmount: Int = 10
@@ -41,13 +40,17 @@ final class MovieQuizPresenter: UIViewController {
         currentQuestionIndex += 1
     }
     
-   func noButton(_ sender: UIButton) {
-        let isCorrect = checkAnswer?(true) ?? false
+    private func handleAnswer(_ answer: Bool) {
+        let isCorrect = checkAnswer?(answer) ?? false
         showAnswerResults?(isCorrect)
+        
+    }
+    
+   func noButton(_ sender: UIButton) {
+       handleAnswer(false)
     }
     
     func yesButton(_ sender: UIButton) {
-        let isCorrect = checkAnswer?(true) ?? false
-        showAnswerResults?(isCorrect)
+        handleAnswer(true)
     }
 }
