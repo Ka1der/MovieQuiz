@@ -20,8 +20,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter: AlertPresenter?
     var currentQuestion: QuizQuestion?
-    private var currentTime: Date?
-    private var recordCorrectAnswers = 0
+    var currentTime: Date?
+    var recordCorrectAnswers = 0
     var correctAnswers = 0
     
     override func viewDidLoad() {
@@ -122,7 +122,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
         }
     }
-    // вынести в presenter
+
     func restartQuiz() {
         presenter.resetQuestionIndex()
         correctAnswers = 0
@@ -133,13 +133,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         let alertModel = AlertModel(title: title, message: message, buttonText: "ОК", completion: completion)
         alertPresenter?.showAlert(model: alertModel)
     }
-    // вынести в presenter
-    func checkRecordCorrectAnswers() {
-        if correctAnswers > recordCorrectAnswers {
-            recordCorrectAnswers = correctAnswers
-            currentTime = Date()
-        }
-    }
+ 
     // вынести в presenter кроме алерта
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
@@ -158,14 +152,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     func presentAlert(alert: UIAlertController) {
         present(alert, animated: true, completion: nil)
     }
-    // вынести в presenter
-    func didCheckAnswer(isCorrect: Bool) {
-        if isCorrect {
-            correctAnswers += 1
-            checkRecordCorrectAnswers()
-        }
-    }
-    // вынести в presenter
+
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
