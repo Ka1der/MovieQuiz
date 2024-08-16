@@ -17,8 +17,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     // Variables
     private var presenter = MovieQuizPresenter()
     private var statisticService: StatisticServiceProtocol = StatisticService()
-    private var questionFactory: QuestionFactoryProtocol?
-    private var alertPresenter: AlertPresenter?
+    var questionFactory: QuestionFactoryProtocol?
+    var alertPresenter: AlertPresenter?
     var currentQuestion: QuizQuestion?
     var currentTime: Date?
     var recordCorrectAnswers = 0
@@ -44,7 +44,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         noButton.layer.cornerRadius = 15
     }
     
-    private func onOffButtons (_ isEnabled: Bool) {
+    func onOffButtons (_ isEnabled: Bool) {
         noButton.isEnabled = isEnabled
         yesButton.isEnabled = isEnabled
     }
@@ -66,7 +66,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             activityIndicator.stopAnimating()
         }
     }
-   
+    
     private func showNetworkError(message: String) {
         showLoadingIndicator(isLoading: false)
         
@@ -93,7 +93,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreenIOS.cgColor : UIColor.ypRedIOS.cgColor
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.imageView.layer.borderColor = UIColor.clear.cgColor
-            self.showNextQuestionOrResults()
+            self.presenter.showNextQuestionOrResults()
         }
     }
     
@@ -108,21 +108,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         let viewModel = presenter.convert(model: question)
         show(quiz: viewModel)
     }
-        // вынести в presenter
+    
     private func showNextQuestionOrResults() {
-        onOffButtons(true)
-        presenter.switchToNextQuestion()
-        
-        if presenter.accessToCurrentQuestionIndex < presenter.questionsAmount {
-            guard let nextQuestion = questionFactory?.requestNextQuestion() else {
-                return
-            }
-            show(quiz: presenter.convert(model: nextQuestion))
-        } else {
-            alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: presenter.questionsAmount)
-        }
+        presenter.showNextQuestionOrResults()
     }
-
+   
     func restartQuiz() {
         presenter.resetQuestionIndex()
         correctAnswers = 0
@@ -133,7 +123,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         let alertModel = AlertModel(title: title, message: message, buttonText: "ОК", completion: completion)
         alertPresenter?.showAlert(model: alertModel)
     }
- 
+    
     func didReceiveNextQuestion(question: QuizQuestion?) {
         presenter.didReceiveNextQuestion(question: question)
     }
@@ -141,7 +131,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     func presentAlert(alert: UIAlertController) {
         present(alert, animated: true, completion: nil)
     }
-
+    
     func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
@@ -152,7 +142,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         onOffButtons(false)
         presenter.noButton(sender)
     }
-   
+    
     @IBAction private func yesButton(_ sender: UIButton) {
         onOffButtons(false)
         presenter.yesButton(sender)

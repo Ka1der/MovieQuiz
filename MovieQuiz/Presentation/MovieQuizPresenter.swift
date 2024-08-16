@@ -7,9 +7,11 @@
 
 import UIKit
 
-final class MovieQuizPresenter: UIViewController {
+final class MovieQuizPresenter {
     
     weak var viewController: MovieQuizViewController?
+    var questionFactory: QuestionFactoryProtocol?
+    weak var alertPresenter: AlertPresenter?
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
     var checkAnswer: ((Bool) -> Bool)?
@@ -64,7 +66,7 @@ final class MovieQuizPresenter: UIViewController {
         let isCorrect = question.correctAnswer == answer
         if isCorrect {
             viewController?.correctAnswers += 1
-           checkRecordCorrectAnswers()
+            checkRecordCorrectAnswers()
         }
         return isCorrect
     }
@@ -94,6 +96,20 @@ final class MovieQuizPresenter: UIViewController {
         
         DispatchQueue.main.async { [weak self] in
             self?.viewController?.show(quiz: viewModel)
+        }
+    }
+    func showNextQuestionOrResults() {
+        viewController?.onOffButtons(true)
+        switchToNextQuestion()
+        
+        if accessToCurrentQuestionIndex < questionsAmount {
+            guard let nextQuestion = viewController?.questionFactory?.requestNextQuestion() else {
+                return
+            }
+            let viewModel = convert(model: nextQuestion)
+            viewController?.show(quiz: viewModel)
+        } else {
+            viewController?.alertPresenter?.showResults(correctAnswers: viewController?.correctAnswers ?? 0, questionsAmount: questionsAmount)
         }
     }
 }
