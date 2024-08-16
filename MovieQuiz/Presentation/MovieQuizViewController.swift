@@ -33,7 +33,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
         
-        requestNextQuestionAndUpdateUI()
+        presenter.requestNextQuestionAndUpdateUI()
         configureButtons()
         showLoadingIndicator(isLoading: true)
         questionFactory?.loadData()
@@ -51,7 +51,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     func didLoadDataFromServer() {
         showLoadingIndicator(isLoading: false)
-        requestNextQuestionAndUpdateUI()
+        presenter.requestNextQuestionAndUpdateUI()
     }
     
     func didFailToLoadData(with error: Error) {
@@ -97,18 +97,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
     }
     
-    // вынести в presenter кроме алерта
-    
-    private func requestNextQuestionAndUpdateUI() {
-        guard let question = questionFactory?.requestNextQuestion() else {
-            showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
-            return
-        }
-        currentQuestion = question
-        let viewModel = presenter.convert(model: question)
-        show(quiz: viewModel)
-    }
-    
     private func showNextQuestionOrResults() {
         presenter.showNextQuestionOrResults()
     }
@@ -116,7 +104,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     func restartQuiz() {
         presenter.resetQuestionIndex()
         correctAnswers = 0
-        requestNextQuestionAndUpdateUI()
+        presenter.requestNextQuestionAndUpdateUI()
     }
     
     func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {

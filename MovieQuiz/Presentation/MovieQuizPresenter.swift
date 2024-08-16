@@ -112,4 +112,13 @@ final class MovieQuizPresenter {
             viewController?.alertPresenter?.showResults(correctAnswers: viewController?.correctAnswers ?? 0, questionsAmount: questionsAmount)
         }
     }
+    func requestNextQuestionAndUpdateUI() {
+            guard let question = viewController?.questionFactory?.requestNextQuestion() else {
+                viewController?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
+                return
+            }
+            viewController?.currentQuestion = question
+            let viewModel = convert(model: question)
+            viewController?.show(quiz: viewModel)
+        }
 }
