@@ -134,26 +134,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         alertPresenter?.showAlert(model: alertModel)
     }
  
-    // вынести в presenter кроме алерта
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else {
-            showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
-            return
-        }
-        
-        currentQuestion = question
-        let viewModel = presenter.convert(model: question)
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
-        }
+        presenter.didReceiveNextQuestion(question: question)
     }
     
     func presentAlert(alert: UIAlertController) {
         present(alert, animated: true, completion: nil)
     }
 
-    private func show(quiz step: QuizStepViewModel) {
+    func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber

@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MovieQuizPresenter {
+final class MovieQuizPresenter: UIViewController {
     
     weak var viewController: MovieQuizViewController?
     let questionsAmount: Int = 10
@@ -81,6 +81,19 @@ final class MovieQuizPresenter {
         if correctAnswers > (viewController.recordCorrectAnswers) {
             viewController.recordCorrectAnswers = correctAnswers
             viewController.currentTime = Date()
+        }
+    }
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            viewController?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
+            return
+        }
+        
+        viewController?.currentQuestion = question
+        let viewModel = convert(model: question)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.show(quiz: viewModel)
         }
     }
 }
