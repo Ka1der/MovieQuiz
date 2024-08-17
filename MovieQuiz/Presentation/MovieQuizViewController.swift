@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate, MovieQuizViewControllerProtocol {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -100,7 +100,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private func showNextQuestionOrResults() {
         presenter.showNextQuestionOrResults()
     }
-   
+    
     func restartQuiz() {
         presenter.resetQuestionIndex()
         correctAnswers = 0
@@ -134,5 +134,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     @IBAction private func yesButton(_ sender: UIButton) {
         onOffButtons(false)
         presenter.yesButton(sender)
+    }
+    func showAlert(title: String, message: String) {
     }
 }

@@ -9,11 +9,12 @@ import UIKit
 
 final class MovieQuizPresenter {
     
+    weak var viewControllerProtocol: MovieQuizViewControllerProtocol?
     weak var viewController: MovieQuizViewController?
     var questionFactory: QuestionFactoryProtocol?
     weak var alertPresenter: AlertPresenter?
-    let questionsAmount: Int = 10
-    private var currentQuestionIndex: Int = 0
+    var questionsAmount: Int = 10
+    var currentQuestionIndex: Int = 0
     var checkAnswer: ((Bool) -> Bool)?
     var showAnswerResults: ((Bool) -> Void)?
     var correctAnswers = 0
@@ -41,8 +42,8 @@ final class MovieQuizPresenter {
     }
     
     private func handleAnswer(_ answer: Bool) {
-        guard let currentQuestion = viewController?.currentQuestion else {
-            viewController?.showAlert(title: "Ошибка", message: "Вопрос не найден")
+        guard let currentQuestion = viewController?.currentQuestion
+        else { viewController?.showAlert(title: "Ошибка", message: "Вопрос не найден")
             return
         }
         
@@ -112,13 +113,14 @@ final class MovieQuizPresenter {
             viewController?.alertPresenter?.showResults(correctAnswers: viewController?.correctAnswers ?? 0, questionsAmount: questionsAmount)
         }
     }
+    
     func requestNextQuestionAndUpdateUI() {
-            guard let question = viewController?.questionFactory?.requestNextQuestion() else {
-                viewController?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
-                return
-            }
-            viewController?.currentQuestion = question
-            let viewModel = convert(model: question)
-            viewController?.show(quiz: viewModel)
+        guard let question = viewController?.questionFactory?.requestNextQuestion() else {
+            viewController?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
+            return
         }
+        viewController?.currentQuestion = question
+        let viewModel = convert(model: question)
+        viewController?.show(quiz: viewModel)
+    }
 }

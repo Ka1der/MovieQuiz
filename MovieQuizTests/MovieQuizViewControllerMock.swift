@@ -10,17 +10,11 @@ import XCTest
 
 final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
     var currentQuestion: MovieQuiz.QuizQuestion?
-    
-    var correctAnswers: Int
-    
-    var recordCorrectAnswers: Int
-    
+    var correctAnswers: Int = 0
+    var recordCorrectAnswers: Int = 0
     var currentTime: Date?
-    
     var questionFactory: (any MovieQuiz.QuestionFactoryProtocol)?
-    
     var alertPresenter: MovieQuiz.AlertPresenter?
-    
     func show(quiz: MovieQuiz.QuizStepViewModel) {
         
     }
@@ -32,21 +26,22 @@ final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
     func onOffButtons(_ on: Bool) {
         
     }
-    
-   
 }
 
 final class MovieQuizPresenterTests: XCTestCase {
+    
     func testPresenterConvertModel() throws {
         let viewControllerMock = MovieQuizViewControllerMock()
-        let sut = MovieQuizPresenter(viewController: viewControllerMock)
-        
-        let emptyData = Data()
-        let question = QuizQuestion(image: emptyData, text: "Question Text", correctAnswer: true)
+        let sut = MovieQuizPresenter()
+        sut.viewControllerProtocol = viewControllerMock
+        sut.questionsAmount = 10
+        sut.currentQuestionIndex = 0
+        let image = UIImage(systemName: "house")?.pngData() ?? Data()
+        let question = QuizQuestion(image: image, text: "testQuestion", correctAnswer: true)
         let viewModel = sut.convert(model: question)
         
-         XCTAssertNotNil(viewModel.image)
-        XCTAssertEqual(viewModel.question, "Question Text")
-        XCTAssertEqual(viewModel.questionNumber, "1/10")
+        XCTAssertNotNil(viewModel.image, "Img")
+        XCTAssertEqual(viewModel.question, "testQuestion", "testQuestion is mached?")
+        XCTAssertEqual(viewModel.questionNumber, "1 / 10", "Question number and current index corerct?")
     }
 }

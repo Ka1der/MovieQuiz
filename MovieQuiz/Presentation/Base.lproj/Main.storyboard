@@ -86,7 +86,6 @@
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
                                                     <action selector="noButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UUE-l9-exw"/>
-                                                    <action selector="noButton:" destination="dkx-z0-nzr" eventType="touchUpInside" id="q4P-rg-RTb"/>
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="F7z-V4-g1C" userLabel="Кнопка ДА">
