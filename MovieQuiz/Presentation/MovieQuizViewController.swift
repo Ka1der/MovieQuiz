@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate, MovieQuizViewControllerProtocol {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -19,7 +19,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private var statisticService: StatisticServiceProtocol = StatisticService()
     var questionFactory: QuestionFactoryProtocol?
     var alertPresenter: AlertPresenter?
-    var currentQuestion: QuizQuestion?
     var currentTime: Date?
     var recordCorrectAnswers = 0
     var correctAnswers = 0

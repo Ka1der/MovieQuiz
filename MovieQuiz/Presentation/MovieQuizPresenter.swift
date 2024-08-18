@@ -11,6 +11,7 @@ final class MovieQuizPresenter {
     
     weak var viewControllerProtocol: MovieQuizViewControllerProtocol?
     weak var viewController: MovieQuizViewController?
+    var currentQuestion: QuizQuestion?
     var questionFactory: QuestionFactoryProtocol?
     weak var alertPresenter: AlertPresenter?
     var questionsAmount: Int = 10
@@ -42,7 +43,7 @@ final class MovieQuizPresenter {
     }
     
     private func handleAnswer(_ answer: Bool) {
-        guard let currentQuestion = viewController?.currentQuestion
+        guard let currentQuestion = currentQuestion
         else { viewController?.showAlert(title: "Ошибка", message: "Вопрос не найден")
             return
         }
@@ -92,7 +93,7 @@ final class MovieQuizPresenter {
             return
         }
         
-        viewController?.currentQuestion = question
+      currentQuestion = question
         let viewModel = convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
@@ -119,7 +120,7 @@ final class MovieQuizPresenter {
             viewController?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
             return
         }
-        viewController?.currentQuestion = question
+      currentQuestion = question
         let viewModel = convert(model: question)
         viewController?.show(quiz: viewModel)
     }
