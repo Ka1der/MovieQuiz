@@ -10,7 +10,7 @@ import UIKit
 final class MovieQuizPresenter {
     
     weak var viewControllerProtocol: MovieQuizViewControllerProtocol?
-    weak var viewController: MovieQuizViewController?
+//    weak var viewController: MovieQuizViewController?
     var currentQuestion: QuizQuestion?
     var questionFactory: QuestionFactoryProtocol?
     weak var alertPresenter: AlertPresenter?
@@ -44,7 +44,7 @@ final class MovieQuizPresenter {
     
     private func handleAnswer(_ answer: Bool) {
         guard let currentQuestion = currentQuestion
-        else { viewController?.showAlert(title: "Ошибка", message: "Вопрос не найден")
+        else {  viewControllerProtocol?.showAlert(title: "Ошибка", message: "Вопрос не найден")
             return
         }
         
@@ -62,12 +62,12 @@ final class MovieQuizPresenter {
     
     private func checkAnswer(_ answer: Bool, currentQuestion: QuizQuestion?) -> Bool {
         guard let question = currentQuestion else {
-            viewController?.showAlert(title: "Ошибка", message: "Вопрос не найден")
+            viewControllerProtocol?.showAlert(title: "Ошибка", message: "Вопрос не найден")
             return false
         }
         let isCorrect = question.correctAnswer == answer
         if isCorrect {
-            viewController?.correctAnswers += 1
+            viewControllerProtocol?.correctAnswers += 1
             checkRecordCorrectAnswers()
         }
         return isCorrect
@@ -75,13 +75,13 @@ final class MovieQuizPresenter {
     
     func didCheckAnswer(isCorrect: Bool) {
         if isCorrect {
-            viewController?.correctAnswers += 1
+            viewControllerProtocol?.correctAnswers += 1
             checkRecordCorrectAnswers()
         }
     }
     
     func checkRecordCorrectAnswers() {
-        guard let viewController = viewController else { return }
+        guard let viewController = viewControllerProtocol else { return }
         if correctAnswers > (viewController.recordCorrectAnswers) {
             viewController.recordCorrectAnswers = correctAnswers
             viewController.currentTime = Date()
@@ -89,7 +89,7 @@ final class MovieQuizPresenter {
     }
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
-            viewController?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
+            viewControllerProtocol?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
             return
         }
         
@@ -97,31 +97,31 @@ final class MovieQuizPresenter {
         let viewModel = convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
-            self?.viewController?.show(quiz: viewModel)
+            self?.viewControllerProtocol?.show(quiz: viewModel)
         }
     }
     func showNextQuestionOrResults() {
-        viewController?.onOffButtons(true)
+        viewControllerProtocol?.onOffButtons(true)
         switchToNextQuestion()
         
         if accessToCurrentQuestionIndex < questionsAmount {
-            guard let nextQuestion = viewController?.questionFactory?.requestNextQuestion() else {
+            guard let nextQuestion =  viewControllerProtocol?.questionFactory?.requestNextQuestion() else {
                 return
             }
             let viewModel = convert(model: nextQuestion)
-            viewController?.show(quiz: viewModel)
+            viewControllerProtocol?.show(quiz: viewModel)
         } else {
-            viewController?.alertPresenter?.showResults(correctAnswers: viewController?.correctAnswers ?? 0, questionsAmount: questionsAmount)
+            viewControllerProtocol?.alertPresenter?.showResults(correctAnswers:  viewControllerProtocol?.correctAnswers ?? 0, questionsAmount: questionsAmount)
         }
     }
     
     func requestNextQuestionAndUpdateUI() {
-        guard let question = viewController?.questionFactory?.requestNextQuestion() else {
-            viewController?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
+        guard let question =  viewControllerProtocol?.questionFactory?.requestNextQuestion() else {
+            viewControllerProtocol?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
             return
         }
       currentQuestion = question
         let viewModel = convert(model: question)
-        viewController?.show(quiz: viewModel)
+        viewControllerProtocol?.show(quiz: viewModel)
     }
 }
