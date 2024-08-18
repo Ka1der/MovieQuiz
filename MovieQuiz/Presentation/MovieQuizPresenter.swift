@@ -92,7 +92,7 @@ final class MovieQuizPresenter {
             return
         }
         
-      currentQuestion = question
+        currentQuestion = question
         let viewModel = convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
@@ -119,7 +119,7 @@ final class MovieQuizPresenter {
             viewControllerProtocol?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
             return
         }
-      currentQuestion = question
+        currentQuestion = question
         let viewModel = convert(model: question)
         viewControllerProtocol?.show(quiz: viewModel)
     }
@@ -134,5 +134,25 @@ final class MovieQuizPresenter {
     func onOffButtons(_ isEnabled: Bool, noButton: UIButton, yesButton: UIButton) {
         noButton.isEnabled = isEnabled
         yesButton.isEnabled = isEnabled
+    }
+    
+    func showNetworkError(message: String) {
+        viewControllerProtocol?.showLoadingIndicator(isLoading: false)
+        
+        let model = AlertModel(title: "Ошибка",
+                               message: message,
+                               buttonText: "Попробовать еще раз") { [weak self] in
+            guard let self = self else { return }
+            
+            self.correctAnswers = 0
+            if let question = self.questionFactory?.requestNextQuestion() {
+                self.didReceiveNextQuestion(question: question)
+            } else {
+                self.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
+            }
+        }
+        alertPresenter?.showAlert(model: model)
+    }
+    func showAlert(title: String, message: String) {
     }
 }

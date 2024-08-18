@@ -51,7 +51,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     func didFailToLoadData(with error: Error) {
-        showNetworkError(message: error.localizedDescription)
+        presenter.showNetworkError(message: error.localizedDescription)
     }
     
     func showLoadingIndicator(isLoading: Bool) {
@@ -61,25 +61,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         } else {
             activityIndicator.stopAnimating()
         }
-    }
-    
-    private func showNetworkError(message: String) {
-        showLoadingIndicator(isLoading: false)
-        
-        let model = AlertModel(title: "Ошибка",
-                               message: message,
-                               buttonText: "Попробовать еще раз") { [weak self] in
-            guard let self = self else { return }
-            
-            self.correctAnswers = 0
-            if let question = self.questionFactory?.requestNextQuestion() {
-                self.didReceiveNextQuestion(question: question)
-            } else {
-                self.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
-            }
-        }
-        
-        alertPresenter?.showAlert(model: model)
     }
     
     private func showAnswerResults(isCorrect: Bool) {
