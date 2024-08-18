@@ -124,4 +124,9 @@ final class MovieQuizPresenter {
         let viewModel = convert(model: question)
         viewControllerProtocol?.show(quiz: viewModel)
     }
+    func viewDidLoad() {
+        viewControllerProtocol?.configureButtons()
+        viewControllerProtocol?.showLoadingIndicator(isLoading: true)
+        viewControllerProtocol?.questionFactory?.loadData()
+    }
 }

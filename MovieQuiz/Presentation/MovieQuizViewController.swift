@@ -34,12 +34,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
         
         presenter.requestNextQuestionAndUpdateUI()
-        configureButtons()
-        showLoadingIndicator(isLoading: true)
-        questionFactory?.loadData()
+        presenter.viewDidLoad()
     }
     
-    private func configureButtons() {
+    internal func configureButtons() {
         yesButton.layer.cornerRadius = 15
         noButton.layer.cornerRadius = 15
     }
@@ -58,7 +56,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         showNetworkError(message: error.localizedDescription)
     }
     
-    private func showLoadingIndicator(isLoading: Bool) {
+    internal func showLoadingIndicator(isLoading: Bool) {
         activityIndicator.isHidden = !isLoading
         if isLoading {
             activityIndicator.startAnimating()
