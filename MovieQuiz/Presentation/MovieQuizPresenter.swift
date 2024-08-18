@@ -10,7 +10,6 @@ import UIKit
 final class MovieQuizPresenter {
     
     weak var viewControllerProtocol: MovieQuizViewControllerProtocol?
-//    weak var viewController: MovieQuizViewController?
     var currentQuestion: QuizQuestion?
     var questionFactory: QuestionFactoryProtocol?
     weak var alertPresenter: AlertPresenter?
@@ -124,9 +123,16 @@ final class MovieQuizPresenter {
         let viewModel = convert(model: question)
         viewControllerProtocol?.show(quiz: viewModel)
     }
+    
     func viewDidLoad() {
         viewControllerProtocol?.configureButtons()
         viewControllerProtocol?.showLoadingIndicator(isLoading: true)
         viewControllerProtocol?.questionFactory?.loadData()
+        requestNextQuestionAndUpdateUI()
+    }
+    
+    func onOffButtons(_ isEnabled: Bool, noButton: UIButton, yesButton: UIButton) {
+        noButton.isEnabled = isEnabled
+        yesButton.isEnabled = isEnabled
     }
 }
