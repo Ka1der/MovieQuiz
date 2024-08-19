@@ -84,11 +84,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         presenter.requestNextQuestionAndUpdateUI()
     }
     
-    func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
-        let alertModel = AlertModel(title: title, message: message, buttonText: "ОК", completion: completion)
-        alertPresenter?.showAlert(model: alertModel)
-    }
-    
     func didReceiveNextQuestion(question: QuizQuestion?) {
         presenter.didReceiveNextQuestion(question: question)
     }
