@@ -100,7 +100,7 @@ final class MovieQuizPresenter {
         }
     }
     func showNextQuestionOrResults() {
-        viewControllerProtocol?.onOffButtons(true)
+        viewControllerProtocol?.didTapOfButtons(true)
         switchToNextQuestion()
         
         if accessToCurrentQuestionIndex < questionsAmount {
@@ -131,7 +131,7 @@ final class MovieQuizPresenter {
         requestNextQuestionAndUpdateUI()
     }
     
-    func onOffButtons(_ isEnabled: Bool, noButton: UIButton, yesButton: UIButton) {
+    func didTapOfButtons(_ isEnabled: Bool, noButton: UIButton, yesButton: UIButton) {
         noButton.isEnabled = isEnabled
         yesButton.isEnabled = isEnabled
     }

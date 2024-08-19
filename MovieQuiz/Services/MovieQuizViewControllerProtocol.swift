@@ -18,7 +18,7 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     
     func show(quiz: QuizStepViewModel)
     func showAlert(title: String, message: String)
-    func onOffButtons(_ on: Bool)
+    func didTapOfButtons(_ on: Bool)
     func configureButtons()
     func showLoadingIndicator(isLoading: Bool)
 }

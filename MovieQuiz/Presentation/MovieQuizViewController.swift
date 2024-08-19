@@ -41,8 +41,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         noButton.layer.cornerRadius = 15
     }
     
-    func onOffButtons (_ isEnabled: Bool) {
-        presenter.onOffButtons(isEnabled, noButton: noButton, yesButton: yesButton)
+    func didTapOfButtons (_ isEnabled: Bool) {
+        presenter.didTapOfButtons(isEnabled, noButton: noButton, yesButton: yesButton)
     }
     
     func didLoadDataFromServer() {
@@ -104,12 +104,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     @IBAction private func noButton(_ sender: UIButton) {
-        onOffButtons(false)
+        didTapOfButtons(false)
         presenter.noButton(sender)
     }
     
     @IBAction private func yesButton(_ sender: UIButton) {
-        onOffButtons(false)
+        didTapOfButtons(false)
         presenter.yesButton(sender)
     }
     func showAlert(title: String, message: String) {
