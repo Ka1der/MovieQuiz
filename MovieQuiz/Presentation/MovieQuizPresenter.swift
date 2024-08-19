@@ -104,16 +104,12 @@ final class MovieQuizPresenter {
         switchToNextQuestion()
         
         if accessToCurrentQuestionIndex < questionsAmount {
-            guard let nextQuestion =  viewControllerProtocol?.questionFactory?.requestNextQuestion() else {
-                return
-            }
-            let viewModel = convert(model: nextQuestion)
-            viewControllerProtocol?.show(quiz: viewModel)
+            requestNextQuestionAndUpdateUI()
         } else {
-            viewControllerProtocol?.alertPresenter?.showResults(correctAnswers:  viewControllerProtocol?.correctAnswers ?? 0, questionsAmount: questionsAmount)
+            viewControllerProtocol?.alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: questionsAmount)
         }
     }
-    
+ 
     func requestNextQuestionAndUpdateUI() {
         guard let question =  viewControllerProtocol?.questionFactory?.requestNextQuestion() else {
             viewControllerProtocol?.showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
@@ -123,14 +119,14 @@ final class MovieQuizPresenter {
         let viewModel = convert(model: question)
         viewControllerProtocol?.show(quiz: viewModel)
     }
-    
+ 
     func viewDidLoad() {
         viewControllerProtocol?.configureButtons()
         viewControllerProtocol?.showLoadingIndicator(isLoading: true)
         viewControllerProtocol?.questionFactory?.loadData()
         requestNextQuestionAndUpdateUI()
     }
-    
+
     func didTapOfButtons(_ isEnabled: Bool, noButton: UIButton, yesButton: UIButton) {
         noButton.isEnabled = isEnabled
         yesButton.isEnabled = isEnabled
@@ -153,6 +149,7 @@ final class MovieQuizPresenter {
         }
         alertPresenter?.showAlert(model: model)
     }
+
     func showAlert(title: String, message: String) {
     }
 }
