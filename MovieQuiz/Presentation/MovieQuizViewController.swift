@@ -1,6 +1,8 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate, MovieQuizViewControllerProtocol {
+    var currentQuestion: QuizQuestion?
+    
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -12,80 +14,53 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     @IBOutlet weak var counterLabel: UILabel!
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet weak var yesButton: UIButton!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     // Variables
+    private var presenter = MovieQuizPresenter()
     private var statisticService: StatisticServiceProtocol = StatisticService()
-    private let questionsAmount: Int = 10
-    private var questionFactory: QuestionFactoryProtocol?
-    private var alertPresenter: AlertPresenter?
-    private var currentQuestion: QuizQuestion?
-    private var currentTime: Date?
-    private var recordCorrectAnswers = 0
-    private var currentQuestionIndex = 0
-    private var correctAnswers = 0
+    var questionFactory: QuestionFactoryProtocol?
+    var alertPresenter: AlertPresenter?
+    var currentTime: Date?
+    var recordCorrectAnswers = 0
+    var correctAnswers = 0
     
-    // Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        yesButton.layer.cornerRadius = 15
-        noButton.layer.cornerRadius = 15
+        presenter.viewControllerProtocol = self
+        presenter.showAnswerResults = {[weak self] isCorrect in self?.showAnswerResults(isCorrect: isCorrect) }
         
-        let questionFactory = QuestionFactory()
-        questionFactory.setup(delegate: self)
-        self.questionFactory = questionFactory
-        self.alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        alertPresenter = AlertPresenter(delegate: self, statisticService: statisticService)
         
-        requestNextQuestionAndUpdateUI()
-        configureButtons()
+        presenter.viewDidLoad()
     }
     
-    private func configureButtons() {
+    func configureButtons() {
         yesButton.layer.cornerRadius = 15
         noButton.layer.cornerRadius = 15
     }
     
-    private func checkAnswer(_ answer: Bool) -> Bool {
-        guard let currentQuestion = currentQuestion else {
-            showAlert(title: "Ошибка", message: "Вопрос не найден")
-            return false
-        }
-        let isCorrect = currentQuestion.correctAnswer == answer
-        if isCorrect {
-            correctAnswers += 1
-            checkRecordCorrectAnswers()
-        }
-        return isCorrect
+    func didTapOfButtons (_ isEnabled: Bool) {
+        presenter.didTapOfButtons(isEnabled, noButton: noButton, yesButton: yesButton)
     }
     
-    private func requestNextQuestionAndUpdateUI() {
-        guard let firstQuestion = questionFactory?.requestNextQuestion() else {
-            showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
-            return
-        }
-        currentQuestion = firstQuestion
-        let viewModel = convert(model: firstQuestion)
-        show(quiz: viewModel)
+    func didLoadDataFromServer() {
+        showLoadingIndicator(isLoading: false)
+        presenter.requestNextQuestionAndUpdateUI()
     }
     
-    private func showNextQuestionOrResults() {
-        noButton.isEnabled = true
-        yesButton.isEnabled = true
-        currentQuestionIndex += 1
-        
-        if currentQuestionIndex < questionsAmount {
-            guard let nextQuestion = questionFactory?.requestNextQuestion() else {
-                return
-            }
-            show(quiz: convert(model: nextQuestion))
+    func didFailToLoadData(with error: Error) {
+        presenter.showNetworkError(message: error.localizedDescription)
+    }
+    
+    func showLoadingIndicator(isLoading: Bool) {
+        activityIndicator.isHidden = !isLoading
+        if isLoading {
+            activityIndicator.startAnimating()
         } else {
-            alertPresenter?.showResults(correctAnswers: correctAnswers, questionsAmount: questionsAmount)
+            activityIndicator.stopAnimating()
         }
-    }
-    
-    func restartQuiz() {
-        currentQuestionIndex = 0
-        correctAnswers = 0
-        requestNextQuestionAndUpdateUI()
     }
     
     private func showAnswerResults(isCorrect: Bool) {
@@ -95,74 +70,43 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreenIOS.cgColor : UIColor.ypRedIOS.cgColor
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.imageView.layer.borderColor = UIColor.clear.cgColor
-            self.showNextQuestionOrResults()
+            self.presenter.showNextQuestionOrResults()
         }
     }
     
-    private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
-        let alertModel = AlertModel(title: title, message: message, buttonText: "ОК", completion: completion)
-        alertPresenter?.showAlert(model: alertModel)
+    private func showNextQuestionOrResults() {
+        presenter.showNextQuestionOrResults()
     }
     
-    private func checkRecordCorrectAnswers() {
-        if correctAnswers > recordCorrectAnswers {
-            recordCorrectAnswers = correctAnswers
-            currentTime = Date()
-        }
+    func restartQuiz() {
+        presenter.resetQuestionIndex()
+        correctAnswers = 0
+        presenter.requestNextQuestionAndUpdateUI()
     }
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else {
-            showAlert(title: "Ошибка!", message: "Не удалось загрузить вопросы")
-            return
-        }
-        
-        currentQuestion = question
-        let viewModel = convert(model: question)
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
-        }
+        presenter.didReceiveNextQuestion(question: question)
     }
     
     func presentAlert(alert: UIAlertController) {
         present(alert, animated: true, completion: nil)
     }
     
-    func didCheckAnswer(isCorrect: Bool) {
-        if isCorrect {
-            correctAnswers += 1
-            checkRecordCorrectAnswers()
-        }
-    }
-    
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
-        )
-        return questionStep
-    }
-    
-    private func show(quiz step: QuizStepViewModel) {
+    func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
     }
     
     @IBAction private func noButton(_ sender: UIButton) {
-        noButton.isEnabled = false
-        yesButton.isEnabled = false
-        let isCorrect = checkAnswer(false)
-        showAnswerResults(isCorrect: isCorrect)
+        didTapOfButtons(false)
+        presenter.noButton(sender)
     }
     
     @IBAction private func yesButton(_ sender: UIButton) {
-        yesButton.isEnabled = false
-        noButton.isEnabled = false
-        let isCorrect = checkAnswer(true)
-        showAnswerResults(isCorrect: isCorrect)
+        didTapOfButtons(false)
+        presenter.yesButton(sender)
     }
-    
+    func showAlert(title: String, message: String) {
+    }
 }

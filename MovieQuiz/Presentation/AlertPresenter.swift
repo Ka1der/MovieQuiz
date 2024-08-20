@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AlertPresenter {
+final class AlertPresenter {
     weak var delegate: AlertPresenterDelegate?
     private let statisticService: StatisticServiceProtocol
     
@@ -18,10 +18,13 @@ class AlertPresenter {
     
     func showAlert(model: AlertModel) {
         let alert = UIAlertController(title: model.title, message: model.message, preferredStyle: .alert)
+        alert.view.accessibilityIdentifier = "GameResultsAlert"
+        
         let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
             model.completion?()
         }
         alert.addAction(action)
+        
         delegate?.presentAlert(alert: alert)
     }
     
@@ -44,9 +47,14 @@ class AlertPresenter {
             Средняя точность: \(formattedAccuracy)%
             """
         
-        let alertModel = AlertModel(title: "Этот раунд окончен!", message: message, buttonText: "Сыграть еще раз") { [weak self] in
+        let alertModel = AlertModel(
+            title: "Этот раунд окончен!",
+            message: message,
+            buttonText: "Сыграть еще раз"
+        ) { [weak self] in
             self?.delegate?.restartQuiz()
         }
+        
         showAlert(model: alertModel)
     }
 }
